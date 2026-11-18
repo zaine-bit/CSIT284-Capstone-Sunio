@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'screens/opening_screen.dart';
 import 'theme/app_colors.dart';
@@ -16,6 +17,8 @@ class CanteenApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: AppColors.background,
+        // Fun rounded font. Try GoogleFonts.baloo2TextTheme() or nunitoTextTheme()
+        textTheme: GoogleFonts.fredokaTextTheme(),
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
           primary: AppColors.primary,

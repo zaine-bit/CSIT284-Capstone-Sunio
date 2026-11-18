@@ -1,7 +1,7 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/food_slide_in.dart';
 import '../widgets/reveal.dart';
 import 'menu_screen.dart';
 
@@ -94,22 +94,8 @@ class _OpeningScreenState extends State<OpeningScreen>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // floating emojis (edit emoji / position / size / phase)
-          FadeTransition(
-            opacity: CurvedAnimation(
-              parent: _intro,
-              curve: const Interval(0.2, 0.7),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _floating('🍜', const Alignment(-0.85, -0.75), 40, 0.0),
-                _floating('🥟', const Alignment(0.85, -0.55), 34, 0.3),
-                _floating('🍟', const Alignment(-0.75, 0.7), 32, 0.6),
-                _floating('🧋', const Alignment(0.8, 0.75), 38, 0.85),
-              ],
-            ),
-          ),
+          // food pictures that slide in from the sides (edit in widgets/food_slide_in.dart)
+          SlidingFoodBackdrop(intro: _intro, float: _float),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -161,22 +147,6 @@ class _OpeningScreenState extends State<OpeningScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _floating(
-      String emoji, Alignment alignment, double size, double phase) {
-    return AnimatedBuilder(
-      animation: _float,
-      builder: (context, child) {
-        final t = (_float.value + phase) % 1.0;
-        final dy = math.sin(t * 2 * math.pi) * 10; // bob distance in px
-        return Align(
-          alignment: alignment,
-          child: Transform.translate(offset: Offset(0, dy), child: child),
-        );
-      },
-      child: Text(emoji, style: TextStyle(fontSize: size)),
     );
   }
 
