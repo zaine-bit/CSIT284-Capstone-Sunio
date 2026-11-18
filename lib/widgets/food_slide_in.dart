@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 class FoodSprite {
   const FoodSprite({
     required this.asset,
-    required this.emoji,
     required this.alignment,
     required this.size,
     required this.fromLeft,
@@ -15,7 +14,6 @@ class FoodSprite {
   });
 
   final String asset; // e.g. 'assets/images/food_1.png'
-  final String emoji; // shown if the image file is missing
   final Alignment alignment; // where it ends up: (-1,-1) top-left ... (1,1) bottom-right
   final double size; // width/height in px
   final bool fromLeft; // true = enters from the left edge, false = from the right
@@ -28,7 +26,6 @@ class FoodSprite {
 const defaultFoodSprites = <FoodSprite>[
   FoodSprite(
     asset: 'assets/images/food_1.png',
-    emoji: '🍗',
     alignment: Alignment(-0.95, -0.8),
     size: 90,
     fromLeft: true,
@@ -38,7 +35,6 @@ const defaultFoodSprites = <FoodSprite>[
   ),
   FoodSprite(
     asset: 'assets/images/food_2.png',
-    emoji: '🍜',
     alignment: Alignment(0.95, -0.55),
     size: 80,
     fromLeft: false,
@@ -48,7 +44,6 @@ const defaultFoodSprites = <FoodSprite>[
   ),
   FoodSprite(
     asset: 'assets/images/food_3.png',
-    emoji: '🥟',
     alignment: Alignment(-0.95, 0.0),
     size: 85,
     fromLeft: true,
@@ -58,7 +53,6 @@ const defaultFoodSprites = <FoodSprite>[
   ),
   FoodSprite(
     asset: 'assets/images/food_4.png',
-    emoji: '🍟',
     alignment: Alignment(0.95, 0.35),
     size: 90,
     fromLeft: false,
@@ -68,7 +62,6 @@ const defaultFoodSprites = <FoodSprite>[
   ),
   FoodSprite(
     asset: 'assets/images/food_5.png',
-    emoji: '🧋',
     alignment: Alignment(-0.9, 0.85),
     size: 80,
     fromLeft: true,
@@ -78,7 +71,6 @@ const defaultFoodSprites = <FoodSprite>[
   ),
   FoodSprite(
     asset: 'assets/images/food_6.png',
-    emoji: '🍌',
     alignment: Alignment(0.9, 0.9),
     size: 85,
     fromLeft: false,
@@ -153,10 +145,15 @@ class _SlidingSprite extends StatelessWidget {
         width: sprite.size,
         height: sprite.size,
         fit: BoxFit.contain,
+        // placeholder shown only while the image file is missing
         errorBuilder: (_, __, ___) => SizedBox(
           width: sprite.size,
           height: sprite.size,
-          child: FittedBox(child: Text(sprite.emoji)),
+          child: Icon(
+            Icons.image_outlined,
+            size: sprite.size * 0.6,
+            color: Colors.white54,
+          ),
         ),
       ),
     );

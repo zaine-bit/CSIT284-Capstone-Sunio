@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -100,17 +101,33 @@ class _OpeningScreenState extends State<OpeningScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Logo: bounces in once, then floats gently.
+                // Change 'assets/images/logo.png' to your file name.
                 ScaleTransition(
                   scale: logoScale,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accent,
-                      shape: BoxShape.circle,
+                  child: AnimatedBuilder(
+                    animation: _float,
+                    builder: (context, child) {
+                      final dy = math.sin(_float.value * 2 * math.pi) * 8;
+                      return Transform.translate(
+                          offset: Offset(0, dy), child: child);
+                    },
+                    child: Image.asset(
+                      'assets/images/open_logo-removebg-preview.png',
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.contain,
+                      // placeholder shown only while the image file is missing
+                      errorBuilder: (_, __, ___) => const SizedBox(
+                        width: 140,
+                        height: 140,
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 80,
+                          color: Colors.white54,
+                        ),
+                      ),
                     ),
-                    child: const Text('🍱', style: TextStyle(fontSize: 56)),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -119,7 +136,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                   start: 0.3,
                   end: 0.7,
                   child: const Text(
-                    'Canteen\nPre-Order',
+                    'BreakBite',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 36,
@@ -135,7 +152,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                   start: 0.4,
                   end: 0.8,
                   child: const Text(
-                    'Order ahead. Skip the line.',
+                    'Grab your food before the bell rings!',
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.onPrimaryMuted,
