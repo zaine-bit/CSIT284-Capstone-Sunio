@@ -45,7 +45,7 @@ const menuItems = <FoodItem>[
     name: 'Banana Cue',
     description: 'Caramelized saba banana on a stick',
     price: 20,
-    image: 'assets/images/menu_banana_cue.png',
+    image: 'assets/images/bananacue.png',
     category: 'Snacks',
   ),
   FoodItem(

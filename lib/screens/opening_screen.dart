@@ -6,6 +6,7 @@ import '../widgets/food_slide_in.dart';
 import '../widgets/reveal.dart';
 import 'menu_screen.dart';
 import 'staff_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// First screen: enter student ID, then go to the menu.
 class OpeningScreen extends StatefulWidget {
@@ -74,7 +75,7 @@ class _OpeningScreenState extends State<OpeningScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: const Color.fromARGB(255, 255, 250, 183),
       body: Column(
         children: [
           Expanded(child: _buildHero()),
@@ -114,9 +115,9 @@ class _OpeningScreenState extends State<OpeningScreen>
                           offset: Offset(0, dy), child: child);
                     },
                     child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 140,
-                      height: 140,
+                      'assets/images/open_logo-removebg-preview.png',
+                      width: 400,
+                      height: 400,
                       fit: BoxFit.contain,
                       // placeholder shown only while the image file is missing
                       errorBuilder: (_, __, ___) => const SizedBox(
@@ -124,7 +125,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                         height: 140,
                         child: Icon(
                           Icons.image_outlined,
-                          size: 80,
+                          size: 200,
                           color: Colors.white54,
                         ),
                       ),
@@ -136,14 +137,13 @@ class _OpeningScreenState extends State<OpeningScreen>
                   controller: _intro,
                   start: 0.3,
                   end: 0.7,
-                  child: const Text(
-                    'Canteen\nPre-Order',
+                  child: Text(
+                    'BiteHub',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 36,
+                    style: GoogleFonts.lilitaOne(
+                      fontSize: 50,
                       height: 1.1,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.onPrimary,
+                      color: const Color.fromARGB(255, 163, 63, 63),
                     ),
                   ),
                 ),
@@ -152,11 +152,13 @@ class _OpeningScreenState extends State<OpeningScreen>
                   controller: _intro,
                   start: 0.4,
                   end: 0.8,
-                  child: const Text(
-                    'Order ahead. Skip the line.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.onPrimaryMuted,
+                  child: Text(
+                    'Order ahead before the bell rings!',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(204, 56, 34, 5),
                     ),
                   ),
                 ),
@@ -209,7 +211,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                   if (_error != null) setState(() => _error = null);
                 },
                 decoration: InputDecoration(
-                  hintText: 'e.g. 2023-01234',
+                  hintText: 'e.g. 24-8464-987',
                   filled: true,
                   fillColor: AppColors.card,
                   prefixIcon: const Icon(Icons.badge_outlined),
