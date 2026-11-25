@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/food_item.dart';
 import '../theme/app_colors.dart';
+import 'food_image.dart';
 
 /// One row in the menu list.
 class FoodCard extends StatelessWidget {
@@ -30,17 +31,7 @@ class FoodCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // emoji box (swap for Image.asset later)
-          Container(
-            width: 76,
-            height: 76,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.primarySoft,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Text(item.emoji, style: const TextStyle(fontSize: 38)),
-          ),
+          FoodImage(image: item.image, size: 76, radius: 18),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
