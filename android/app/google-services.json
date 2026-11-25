@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "60097351636",
+    "project_id": "canteen-preorder-sunio",
+    "storage_bucket": "canteen-preorder-sunio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60097351636:android:d1be199d667b3fef989041",
+        "android_client_info": {
+          "package_name": "com.example.canteen_pre_order"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC6BReyF-WkSB8BFKfmPOvVvhhc8bLCgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

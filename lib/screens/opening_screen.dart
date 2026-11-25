@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../widgets/food_slide_in.dart';
 import '../widgets/reveal.dart';
 import 'menu_screen.dart';
+import 'staff_screen.dart';
 
 /// First screen: enter student ID, then go to the menu.
 class OpeningScreen extends StatefulWidget {
@@ -113,7 +114,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                           offset: Offset(0, dy), child: child);
                     },
                     child: Image.asset(
-                      'assets/images/open_logo-removebg-preview.png',
+                      'assets/images/logo.png',
                       width: 140,
                       height: 140,
                       fit: BoxFit.contain,
@@ -136,7 +137,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                   start: 0.3,
                   end: 0.7,
                   child: const Text(
-                    'BreakBite',
+                    'Canteen\nPre-Order',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 36,
@@ -152,7 +153,7 @@ class _OpeningScreenState extends State<OpeningScreen>
                   start: 0.4,
                   end: 0.8,
                   child: const Text(
-                    'Grab your food before the bell rings!',
+                    'Order ahead. Skip the line.',
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.onPrimaryMuted,
@@ -262,6 +263,12 @@ class _OpeningScreenState extends State<OpeningScreen>
                 child: Text(
                   'Pay with cash when you pick up',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                ),
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: () => openStaffGate(context),
+                  child: const Text('Canteen staff'),
                 ),
               ),
             ],

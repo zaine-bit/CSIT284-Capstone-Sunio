@@ -25,7 +25,7 @@ class FoodSprite {
 /// EDIT THIS LIST: add, remove or move food pictures.
 const defaultFoodSprites = <FoodSprite>[
   FoodSprite(
-    asset: 'porksisigrice.png',
+    asset: 'assets/images/food_1.png',
     alignment: Alignment(-0.95, -0.8),
     size: 90,
     fromLeft: true,
@@ -34,7 +34,7 @@ const defaultFoodSprites = <FoodSprite>[
     phase: 0.0,
   ),
   FoodSprite(
-    asset: 'chickenadoborice.png',
+    asset: 'assets/images/food_2.png',
     alignment: Alignment(0.95, -0.55),
     size: 80,
     fromLeft: false,

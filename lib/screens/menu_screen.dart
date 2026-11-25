@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../data/menu_data.dart';
 import '../models/food_item.dart';
+import '../services/firestore_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/food_card.dart';
+import 'cart_screen.dart';
+import 'order_status_screen.dart';
 
-/// Category chips, animated list, add/remove, floating cart bar.
+/// Category chips, animated list (from Firestore), add/remove, floating cart bar.
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key, required this.studentId});
 
@@ -18,89 +21,147 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   String _category = 'All';
-  final Map<String, int> _cart = {}; // item name -> quantity
+  final Map<String, int> _cart = {}; // item id -> quantity
 
-  int get _count => _cart.values.fold<int>(0, (a, b) => a + b);
+  late final Stream<List<FoodItem>> _menuStream =
+      FirestoreService.instance.menuStream();
 
-  int get _total => menuItems.fold<int>(
-      0, (sum, item) => sum + item.price * (_cart[item.name] ?? 0));
-
-  List<FoodItem> get _visibleItems => _category == 'All'
-      ? menuItems
-      : menuItems.where((i) => i.category == _category).toList();
+  @override
+  void initState() {
+    super.initState();
+    // First run only: uploads the sample menu if Firestore has no menu yet.
+    FirestoreService.instance.seedMenuIfEmpty().catchError((Object e) {
+      debugPrint('Menu seed failed: $e');
+    });
+  }
 
   void _add(FoodItem item) =>
-      setState(() => _cart[item.name] = (_cart[item.name] ?? 0) + 1);
+      setState(() => _cart[item.id] = (_cart[item.id] ?? 0) + 1);
 
   void _remove(FoodItem item) {
     setState(() {
-      final qty = (_cart[item.name] ?? 0) - 1;
+      final qty = (_cart[item.id] ?? 0) - 1;
       if (qty <= 0) {
-        _cart.remove(item.name);
+        _cart.remove(item.id);
       } else {
-        _cart[item.name] = qty;
+        _cart[item.id] = qty;
       }
     });
   }
 
+  Future<void> _openCart(List<FoodItem> menu) async {
+    final placed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => CartScreen(
+          studentId: widget.studentId,
+          menu: menu,
+          cart: _cart, // shared map: edits in the cart show up here too
+          onChanged: () => setState(() {}),
+        ),
+      ),
+    );
+    if (placed == true && mounted) setState(() => _cart.clear());
+  }
+
+  void _openOrders() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => OrderStatusScreen(studentId: widget.studentId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final items = _visibleItems;
-
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _buildHeader(),
-                _buildPickupBanner(),
-                const SizedBox(height: 16),
-                _buildCategoryChips(),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: ListView.builder(
-                      // new key = list re-animates when category changes
-                      key: ValueKey(_category),
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        return TweenAnimationBuilder<double>(
-                          tween: Tween<double>(begin: 0, end: 1),
-                          duration: Duration(
-                              milliseconds: 350 + math.min(index, 6) * 70),
-                          curve: Curves.easeOutCubic,
-                          builder: (context, value, child) => Opacity(
-                            opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 24 * (1 - value)),
-                              child: child,
-                            ),
-                          ),
-                          child: FoodCard(
-                            item: item,
-                            qty: _cart[item.name] ?? 0,
-                            onAdd: () => _add(item),
-                            onRemove: () => _remove(item),
-                          ),
-                        );
-                      },
-                    ),
+        child: StreamBuilder<List<FoodItem>>(
+          stream: _menuStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Could not load the menu.\n${snapshot.error}',
+                    textAlign: TextAlign.center,
                   ),
                 ),
+              );
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final menu = snapshot.data!;
+            final items = _category == 'All'
+                ? menu
+                : menu.where((i) => i.category == _category).toList();
+
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    _buildHeader(),
+                    _buildPickupBanner(),
+                    const SizedBox(height: 16),
+                    _buildCategoryChips(),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: items.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'No items here yet.',
+                                style: TextStyle(color: AppColors.textMuted),
+                              ),
+                            )
+                          : AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: ListView.builder(
+                                // new key = list re-animates on category change
+                                key: ValueKey(_category),
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 8, 20, 120),
+                                itemCount: items.length,
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  return TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(begin: 0, end: 1),
+                                    duration: Duration(
+                                        milliseconds:
+                                            350 + math.min(index, 6) * 70),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, value, child) =>
+                                        Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(0, 24 * (1 - value)),
+                                        child: child,
+                                      ),
+                                    ),
+                                    child: FoodCard(
+                                      item: item,
+                                      qty: _cart[item.id] ?? 0,
+                                      onAdd: () => _add(item),
+                                      onRemove: () => _remove(item),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+                _buildCartBar(menu),
               ],
-            ),
-            _buildCartBar(),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  // ----- greeting + back button -----
+  // ----- greeting + my orders + back button -----
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
@@ -129,6 +190,11 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ],
             ),
+          ),
+          IconButton.filledTonal(
+            onPressed: _openOrders,
+            tooltip: 'My orders',
+            icon: const Icon(Icons.receipt_long_rounded),
           ),
           IconButton.filledTonal(
             onPressed: () => Navigator.of(context).pop(),
@@ -203,8 +269,12 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   // ----- floating cart bar (slides up when cart has items) -----
-  Widget _buildCartBar() {
-    final hasItems = _count > 0;
+  Widget _buildCartBar(List<FoodItem> menu) {
+    final count = menu.fold<int>(0, (s, i) => s + (_cart[i.id] ?? 0));
+    final total =
+        menu.fold<int>(0, (s, i) => s + i.price * (_cart[i.id] ?? 0));
+    final hasItems = count > 0;
+
     return Positioned(
       left: 16,
       right: 16,
@@ -223,12 +293,7 @@ class _MenuScreenState extends State<MenuScreen> {
               borderRadius: BorderRadius.circular(22),
               child: InkWell(
                 borderRadius: BorderRadius.circular(22),
-                onTap: () {
-                  // TODO: open cart screen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Cart screen comes next')),
-                  );
-                },
+                onTap: () => _openCart(menu),
                 child: Padding(
                   padding: const EdgeInsets.all(14),
                   child: Row(
@@ -246,8 +311,8 @@ class _MenuScreenState extends State<MenuScreen> {
                           transitionBuilder: (child, anim) =>
                               ScaleTransition(scale: anim, child: child),
                           child: Text(
-                            '$_count',
-                            key: ValueKey(_count),
+                            '$count',
+                            key: ValueKey(count),
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               color: AppColors.text,
@@ -267,7 +332,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                       ),
                       Text(
-                        '₱$_total',
+                        '₱$total',
                         style: const TextStyle(
                           color: AppColors.onPrimary,
                           fontSize: 18,
